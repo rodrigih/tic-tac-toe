@@ -1,0 +1,45 @@
+html, body{
+  background-image: url("../images/background.jpg");
+  height:100%;
+  width:100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#app{
+  border-radius:10px;
+  height:60%;
+  width:60%;
+  background-color: green;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction:column;
+}
+
+#main-menu{
+  /*Set these both to 100% since 'app' div is wrapper for menu div*/
+  text-align: center;
+  color:white;
+  padding: 20px;
+}
+
+#main-menu > h1{
+  font-family: 'Mogra';
+  font-size: 5em;
+  color: yellow;
+  text-decoration:underline;
+  padding-bottom:40px;
+}
+
+/* Make font bigger when option hovered over*/
+#main-menu > a:hover{
+  font-size: 20px;
+}
+
+.menu-item{
+  font-size: 2em;
+  display: block;
+  color:white;
+}
