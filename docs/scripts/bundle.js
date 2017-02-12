@@ -20509,15 +20509,78 @@ class App extends React.Component{
 
 module.exports = App;
 
-},{"../containers/menu.js":180,"react":178}],180:[function(require,module,exports){
+},{"../containers/menu.js":182,"react":178}],180:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
+
+class Options extends React.Component{
+  constructor(){
+    super();
+  }
+
+  render(){
+    return (
+      React.createElement("div", null, 
+        React.createElement("h1", null, "Options Menu"), 
+        React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+          React.createElement("span", {className: "menu-item"}, "Main Menu"))
+      )
+    );
+  }
+}
+
+module.exports = Options;
+
+},{"react":178}],181:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+class Board extends React.Component{
+  constructor(){
+    super();
+    this.state = this.getInitialState();
+  }
+
+  getInitialState(){
+    return {
+      player: 'one',
+      current: 'x',
+      running: true,
+      board: []
+    };
+  }
+
+  render(){
+    return (
+      React.createElement("div", null, 
+        React.createElement("h1", null, "Game Board"), 
+        React.createElement("ul", null, 
+          React.createElement("li", null, this.props.mode), 
+          React.createElement("li", null, this.props.theme)
+        ), 
+        React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+          React.createElement("span", {className: "menu-item"}, "Main Menu"))
+      )
+    );
+  }
+}
+
+module.exports = Board;
+
+},{"react":178}],182:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var Board = require('./board.js');
+var Options = require('../components/options.js');
 
 class Menu extends React.Component{
   constructor(){
     super();
     this.state = this.getInitialState();
+    this.changeSelected = this.changeSelected.bind(this);
   }
 
   getInitialState(){
@@ -20530,23 +20593,81 @@ class Menu extends React.Component{
     };
   }
 
-  render(){
-      return (
-        React.createElement("div", {id: "main-menu"}, 
-          React.createElement("h1", null, "Tic-Tac-Toe"), 
-          React.createElement("a", {href: "#"}, React.createElement("span", {className: "menu-item"}, "Single Player")), 
-          React.createElement("a", {href: "#"}, React.createElement("span", {className: "menu-item"}, "Multi Player")), 
-          React.createElement("a", {href: "#"}, React.createElement("span", {className: "menu-item"}, "Options")), 
-          React.createElement("a", {href: "#"}, React.createElement("span", {className: "menu-item"}, "Credits"))
+  handleChangeOptions(){
+    return;
+  }
 
-        ));
+  changeSelected(e){
+    var newSelected = e.target.innerHTML.split(' ')[0].toLowerCase();
+    console.log(newSelected);
+    this.setState({selected: newSelected});
+  }
+
+  getMainMenu(){
+    return (
+      React.createElement("div", {id: "main-menu"}, 
+        React.createElement("h1", null, "Tic-Tac-Toe"), 
+        React.createElement("a", {href: "#", onClick: this.changeSelected}, 
+          React.createElement("span", {className: "menu-item"}, "One Player")), 
+        React.createElement("a", {href: "#", onClick: this.changeSelected}, 
+          React.createElement("span", {className: "menu-item"}, "Two Players")), 
+        React.createElement("a", {href: "#", onClick: this.changeSelected}, 
+          React.createElement("span", {className: "menu-item"}, "Options")), 
+        React.createElement("a", {href: "#", onClick: this.changeSelected}, 
+          React.createElement("span", {className: "menu-item"}, "Credits"))
+
+      ));
+  }
+
+  getBoard(){
+    return React.createElement(Board, {mode: this.state.selected, 
+                  theme: this.state.options.theme, 
+                  toMainMenu: this.changeSelected})
+  }
+
+  getOptionsMenu(){
+    return React.createElement(Options, {changeOptions: this.handleChangeOptions, 
+                    toMainMenu: this.changeSelected})
+  }
+
+  getCredits(){
+    return (
+      React.createElement("div", null, 
+        React.createElement("h1", null, "Credits"), 
+        React.createElement("a", {href: "#", onClick: this.changeSelected}, 
+          React.createElement("span", {className: "menu-item"}, "Main Menu"))
+      )
+    );
+  }
+
+  render(){
+    var toRender;
+
+    switch(this.state.selected){
+      case 'one':
+      case 'two':
+        toRender = this.getBoard();
+        break;
+      case 'options':
+        toRender = this.getOptionsMenu();
+        break;
+      case 'credits':
+        toRender = this.getCredits();
+        break;
+      case 'main':
+      default:
+        toRender = this.getMainMenu();
+        break;
+
+    }
+    return toRender;
   }
 
 }
 
 module.exports = Menu;
 
-},{"react":178}],181:[function(require,module,exports){
+},{"../components/options.js":180,"./board.js":181,"react":178}],183:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -20555,4 +20676,4 @@ var App = require('./components/app.js');
 
 ReactDOM.render(React.createElement(App, null),document.getElementById('app'));
 
-},{"./components/app.js":179,"react":178,"react-dom":25}]},{},[181]);
+},{"./components/app.js":179,"react":178,"react-dom":25}]},{},[183]);
