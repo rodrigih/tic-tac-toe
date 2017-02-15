@@ -19,15 +19,80 @@ html, body{
   align-items: center;
 }
 
+.general-paragraph{
+  color:white;
+  font-size: 20px;
+}
+
+.menu-item{
+  font-size: 2em;
+  display: block;
+  color:white;
+}
+
+.center-container{
+  width:100%;
+  height:100%;
+  display: flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  align-items: center;
+  flex-direction:column;
+}
+
+.column-container{
+  width:90%;
+  margin:auto;
+  height:100%;
+  display:flex;
+  justify-content: space-around;
+  flex-direction: column;
+  align-items: center;
+  align-content:space-around;
+}
+
+.row-container{
+  width:100%;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+}
+
+.general-link{
+  color:yellow;
+}
+
+.piece-div{
+  width:33%;
+  border: thin white solid;
+  text-align:center;
+  font-size:3em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.game-piece{
+  font-family: 'Barrio';
+}
+
+
 #app{
   border-radius:10px;
   height:60%;
   width:60%;
   background-color: green;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction:column;
+}
+
+#board{
+  width:80%;
+  height:70%;
+  margin:auto;
+
+  display:flex;
+  flex-flow: row wrap;
+  align-items: stretch;
+  align-content: stretch;
 }
 
 #main-menu{
@@ -37,7 +102,7 @@ html, body{
   padding: 20px;
 }
 
-#main-menu > h1{
+#title{
   font-family: 'Mogra';
   font-size: 5em;
   color: yellow;
@@ -48,10 +113,4 @@ html, body{
 /* Make font bigger when option hovered over*/
 #main-menu > a:hover{
   font-size: 20px;
-}
-
-.menu-item{
-  font-size: 2em;
-  display: block;
-  color:white;
 }

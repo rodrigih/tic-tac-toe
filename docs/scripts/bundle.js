@@ -20492,27 +20492,6 @@ module.exports = require('./lib/React');
 'use strict';
 
 var React = require('react');
-var Menu = require('../containers/menu.js');
-
-class App extends React.Component{
-  constructor(){
-    super();
-  }
-
-  render(){
-    return (
-        React.createElement(Menu, null)
-      );
-  }
-
-}
-
-module.exports = App;
-
-},{"../containers/menu.js":182,"react":178}],180:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
 
 class Options extends React.Component{
   constructor(){
@@ -20521,9 +20500,9 @@ class Options extends React.Component{
 
   render(){
     return (
-      React.createElement("div", null, 
+      React.createElement("div", {className: "column-container"}, 
         React.createElement("h1", null, "Options Menu"), 
-        React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+        React.createElement("a", {href: "#", className: "return-link", onClick: this.props.toMainMenu}, 
           React.createElement("span", {className: "menu-item"}, "Main Menu"))
       )
     );
@@ -20532,10 +20511,34 @@ class Options extends React.Component{
 
 module.exports = Options;
 
+},{"react":178}],180:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+class Piece extends React.Component{
+  constructor(){
+    super();
+  }
+
+  getImage(){
+    return (Math.random() < .5? 'X':'O');
+  }
+
+  render(){
+    return (
+      React.createElement("div", {className: "piece-div"}, React.createElement("p", {className: "game-piece"}, this.getImage()))
+    );
+  }
+}
+
+module.exports = Piece;
+
 },{"react":178}],181:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
+var Piece = require('../components/piece.js');
 
 class Board extends React.Component{
   constructor(){
@@ -20554,13 +20557,33 @@ class Board extends React.Component{
 
   render(){
     return (
-      React.createElement("div", null, 
-        React.createElement("h1", null, "Game Board"), 
-        React.createElement("ul", null, 
-          React.createElement("li", null, this.props.mode), 
-          React.createElement("li", null, this.props.theme)
+      React.createElement("div", {className: "column-container"}, 
+        React.createElement("h1", {id: "title"}, "Tic-Tac-Toe"), 
+
+        React.createElement("div", {className: "row-container"}, 
+          React.createElement("p", {className: "general-paragraph"}, "P1: ", React.createElement("span", {id: "score1"}, "0")), 
+          React.createElement("p", {className: "general-paragraph"}, "P2: ", React.createElement("span", {id: "score2"}, "0"))
         ), 
-        React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+
+        React.createElement("div", null, React.createElement("p", {className: "general-paragraph"}, 
+          "It is now ", React.createElement("span", {id: "current", className: "game-piece"}, " X "), "'s turn."
+        )), 
+
+        React.createElement("div", {id: "board"}, 
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""}), 
+
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""}), 
+
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""}), 
+            React.createElement(Piece, {value: ""})
+        ), 
+
+        React.createElement("a", {href: "#", className: "return-link", onClick: this.props.toMainMenu}, 
           React.createElement("span", {className: "menu-item"}, "Main Menu"))
       )
     );
@@ -20569,7 +20592,7 @@ class Board extends React.Component{
 
 module.exports = Board;
 
-},{"react":178}],182:[function(require,module,exports){
+},{"../components/piece.js":180,"react":178}],182:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -20605,8 +20628,8 @@ class Menu extends React.Component{
 
   getMainMenu(){
     return (
-      React.createElement("div", {id: "main-menu"}, 
-        React.createElement("h1", null, "Tic-Tac-Toe"), 
+      React.createElement("div", {className: "center-container", id: "main-menu"}, 
+        React.createElement("h1", {id: "title"}, "Tic-Tac-Toe"), 
         React.createElement("a", {href: "#", onClick: this.changeSelected}, 
           React.createElement("span", {className: "menu-item"}, "One Player")), 
         React.createElement("a", {href: "#", onClick: this.changeSelected}, 
@@ -20632,11 +20655,19 @@ class Menu extends React.Component{
 
   getCredits(){
     return (
-      React.createElement("div", null, 
+      React.createElement("div", {className: "column-container"}, 
         React.createElement("h1", null, "Credits"), 
+        React.createElement("p", {className: "general-paragraph"}, 
+          "This project was made using the React Javascript framework by" + ' ' +
+          "Rodrigo Hernandez. Source code can be found ", React.createElement("span", null, " "), 
+          React.createElement("a", {className: "general-link", 
+             href: "https://github.com/rodrigih/tic-tac-toe", 
+             target: "_blank"}, "here")
+        ), 
         React.createElement("a", {href: "#", onClick: this.changeSelected}, 
           React.createElement("span", {className: "menu-item"}, "Main Menu"))
       )
+
     );
   }
 
@@ -20662,18 +20693,17 @@ class Menu extends React.Component{
     }
     return toRender;
   }
-
 }
 
 module.exports = Menu;
 
-},{"../components/options.js":180,"./board.js":181,"react":178}],183:[function(require,module,exports){
+},{"../components/options.js":179,"./board.js":181,"react":178}],183:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var App = require('./components/app.js');
+var Menu = require('./containers/menu.js');
 
-ReactDOM.render(React.createElement(App, null),document.getElementById('app'));
+ReactDOM.render(React.createElement(Menu, null),document.getElementById('app'));
 
-},{"./components/app.js":179,"react":178,"react-dom":25}]},{},[183]);
+},{"./containers/menu.js":182,"react":178,"react-dom":25}]},{},[183]);

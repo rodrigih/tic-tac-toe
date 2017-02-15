@@ -33,8 +33,8 @@ class Menu extends React.Component{
 
   getMainMenu(){
     return (
-      <div id='main-menu'>
-        <h1>Tic-Tac-Toe</h1>
+      <div className='center-container' id='main-menu'>
+        <h1 id='title'>Tic-Tac-Toe</h1>
         <a href='#' onClick={this.changeSelected}>
           <span className='menu-item'>One Player</span></a>
         <a href='#'onClick={this.changeSelected}>
@@ -60,11 +60,19 @@ class Menu extends React.Component{
 
   getCredits(){
     return (
-      <div>
+      <div className='column-container'>
         <h1>Credits</h1>
+        <p className='general-paragraph'>
+          This project was made using the React Javascript framework by
+          Rodrigo Hernandez. Source code can be found <span> </span>
+          <a className='general-link'
+             href='https://github.com/rodrigih/tic-tac-toe'
+             target='_blank'>here</a>
+        </p>
         <a href="#" onClick={this.changeSelected}>
           <span className='menu-item'>Main Menu</span></a>
       </div>
+
     );
   }
 
@@ -90,7 +98,6 @@ class Menu extends React.Component{
     }
     return toRender;
   }
-
 }
 
 module.exports = Menu;
