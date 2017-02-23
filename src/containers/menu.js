@@ -27,7 +27,6 @@ class Menu extends React.Component{
 
   changeSelected(e){
     var newSelected = e.target.innerHTML.split(' ')[0].toLowerCase();
-    console.log(newSelected);
     this.setState({selected: newSelected});
   }
 

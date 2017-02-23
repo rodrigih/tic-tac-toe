@@ -5,15 +5,19 @@ var React = require('react');
 class Piece extends React.Component{
   constructor(){
     super();
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  getImage(){
-    return (Math.random() < .5? 'X':'O');
+  handleClick(){
+    this.props.placePiece(this.props.index);
   }
 
   render(){
     return (
-      <div className='piece-div'><p className='game-piece'>{this.getImage()}</p></div>
+      <div className='piece-div'
+           onClick={this.handleClick}>
+           <p className='game-piece'>{this.props.value}</p>
+      </div>
     );
   }
 }

@@ -52,6 +52,7 @@ html, body{
 
 .piece-div{
   width:33%;
+  height:33%;
   border: thin white solid;
   text-align:center;
   font-size:3em;
@@ -61,6 +62,8 @@ html, body{
 }
 
 .game-piece{
+  margin:0;
+  padding:0;
   font-family: 'Barrio';
 }
 

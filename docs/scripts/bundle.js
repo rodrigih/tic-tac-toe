@@ -20519,15 +20519,19 @@ var React = require('react');
 class Piece extends React.Component{
   constructor(){
     super();
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  getImage(){
-    return (Math.random() < .5? 'X':'O');
+  handleClick(){
+    this.props.placePiece(this.props.index);
   }
 
   render(){
     return (
-      React.createElement("div", {className: "piece-div"}, React.createElement("p", {className: "game-piece"}, this.getImage()))
+      React.createElement("div", {className: "piece-div", 
+           onClick: this.handleClick}, 
+           React.createElement("p", {className: "game-piece"}, this.props.value)
+      )
     );
   }
 }
@@ -20544,18 +20548,41 @@ class Board extends React.Component{
   constructor(){
     super();
     this.state = this.getInitialState();
+    this.placePiece = this.placePiece.bind(this);
   }
 
   getInitialState(){
     return {
       player: 'one',
-      current: 'x',
+      current: 'X',
       running: true,
-      board: []
+      boardValues: Array.from(Array(9),() => '')
     };
   }
 
+  changeTurn(){
+    var next = (this.state.current == 'X'? 'O' : 'X');
+    return next;
+  }
+
+  placePiece(index){
+    var newBoard = this.state.boardValues.slice();
+
+    /* Don't do anything if there is already a piece placed*/
+    if(this.state.boardValues[index] !== ''){
+      return;
+    }
+
+    newBoard[index] = this.state.current;
+
+    this.setState({
+      current: this.changeTurn(),
+      boardValues: newBoard
+    });
+  }
+
   render(){
+    console.log(this.state.boardValues);
     return (
       React.createElement("div", {className: "column-container"}, 
         React.createElement("h1", {id: "title"}, "Tic-Tac-Toe"), 
@@ -20566,21 +20593,17 @@ class Board extends React.Component{
         ), 
 
         React.createElement("div", null, React.createElement("p", {className: "general-paragraph"}, 
-          "It is now ", React.createElement("span", {id: "current", className: "game-piece"}, " X "), "'s turn."
+          "It is now ", React.createElement("span", {id: "current", className: "game-piece"}, 
+           this.state.current
+            ), "'s turn."
         )), 
 
         React.createElement("div", {id: "board"}, 
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""}), 
-
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""}), 
-
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""}), 
-            React.createElement(Piece, {value: ""})
+            this.state.boardValues.map(
+              (current,i) => (React.createElement(Piece, {value: current, 
+                                     key: i, 
+                                     index: i, 
+                                     placePiece: this.placePiece})))
         ), 
 
         React.createElement("a", {href: "#", className: "return-link", onClick: this.props.toMainMenu}, 
@@ -20622,7 +20645,6 @@ class Menu extends React.Component{
 
   changeSelected(e){
     var newSelected = e.target.innerHTML.split(' ')[0].toLowerCase();
-    console.log(newSelected);
     this.setState({selected: newSelected});
   }
 
