@@ -20549,20 +20549,69 @@ class Board extends React.Component{
     super();
     this.state = this.getInitialState();
     this.placePiece = this.placePiece.bind(this);
+    this.checkWinner = this.checkWinner.bind(this);
+    this.restartGame = this.restartGame.bind(this);
   }
 
   getInitialState(){
     return {
       player: 'one',
       current: 'X',
+      winner: '',
       running: true,
       boardValues: Array.from(Array(9),() => '')
     };
   }
 
+  restartGame(){
+    this.setState(this.getInitialState());
+  }
+
+  getWinnerScreen(){
+    return (
+      React.createElement("div", {id: "win-container"}, 
+        React.createElement("div", {id: "win-menu"}, 
+
+          React.createElement("h1", {id: "title"}, this.state.winner, " is the winner!"), 
+
+          React.createElement("a", {href: "#", onClick: this.restartGame}, 
+            React.createElement("span", {className: "menu-item"}, "Play Again")
+          ), 
+
+          React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+            React.createElement("span", {className: "menu-item"}, "Main Menu")
+          )
+        )
+      )
+    );
+  }
+
   changeTurn(){
     var next = (this.state.current == 'X'? 'O' : 'X');
     return next;
+  }
+
+  checkWinner(board){
+    var toCheck = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8],
+      [0,3,6],
+      [1,4,7],
+      [2,5,8],
+      [0,4,8],
+      [2,4,6]];
+
+
+    var isWinner =
+    toCheck.map( (current) =>{
+        return board.filter((c,i) => {return current.includes(i)})
+             .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
+      })
+      .reduce((acc,curr) =>{return acc || curr},false);
+
+
+    return (isWinner? this.state.current :'');
   }
 
   placePiece(index){
@@ -20577,12 +20626,13 @@ class Board extends React.Component{
 
     this.setState({
       current: this.changeTurn(),
-      boardValues: newBoard
+      boardValues: newBoard,
+      winner: this.checkWinner(newBoard)
     });
+
   }
 
   render(){
-    console.log(this.state.boardValues);
     return (
       React.createElement("div", {className: "column-container"}, 
         React.createElement("h1", {id: "title"}, "Tic-Tac-Toe"), 
@@ -20606,9 +20656,12 @@ class Board extends React.Component{
                                      placePiece: this.placePiece})))
         ), 
 
-        React.createElement("a", {href: "#", className: "return-link", onClick: this.props.toMainMenu}, 
-          React.createElement("span", {className: "menu-item"}, "Main Menu"))
+        React.createElement("a", {href: "#", onClick: this.props.toMainMenu}, 
+          React.createElement("span", {className: "menu-item"}, "Main Menu")), 
+
+        (this.state.winner != '' ? this.getWinnerScreen(): '')
       )
+
     );
   }
 }
