@@ -17,7 +17,6 @@ class Board extends React.Component{
       player: 'one',
       current: 'X',
       winner: '',
-      running: true,
       boardValues: Array.from(Array(9),() => '')
     };
   }
@@ -62,12 +61,13 @@ class Board extends React.Component{
       [2,4,6]];
 
 
-    var isWinner =
-    toCheck.map( (current) =>{
+    /* This checks if there is 3 in a row at each triplet shown in toCheck, then
+    uses reduce get a single truth value indicating whether there is a winner or
+    not. */
+    var isWinner = toCheck.map( (current) => {
         return board.filter((c,i) => {return current.includes(i)})
              .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
-      })
-      .reduce((acc,curr) =>{return acc || curr},false);
+      }).reduce((acc,curr) =>{return acc || curr},false);
 
 
     return (isWinner? this.state.current :'');

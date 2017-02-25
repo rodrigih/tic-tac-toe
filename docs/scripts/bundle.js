@@ -20496,17 +20496,89 @@ var React = require('react');
 class Options extends React.Component{
   constructor(){
     super();
+    this.handleDifficultyClick = this.handleDifficultyClick.bind(this);
+    this.handleThemeClick = this.handleThemeClick.bind(this);
+  }
+
+  handleDifficultyClick(e){
+    var difficultyOptions = ['easy','medium','hard'];
+    var current = difficultyOptions.indexOf(this.props.options.difficulty);
+
+    var index;
+
+    if(e.target.className.includes('left')){
+      index = (current - 1 < 0 ? difficultyOptions.length-1 : current - 1);
+    }else{
+      index = (current + 1) % difficultyOptions.length;
+    }
+
+    this.props.changeOptions('difficulty',difficultyOptions[index]);
+  }
+
+  handleThemeClick(e){
+    var themeOptions = ['default', 'theme2', 'theme3'];
+    var current = themeOptions.indexOf(this.props.options.theme);
+
+    var index;
+
+    if(e.target.className.includes('left')){
+      index = (current - 1 < 0 ? themeOptions.length-1 : current - 1);
+    }else{
+      index = (current + 1) % themeOptions.length;
+    }
+
+    this.props.changeOptions('theme',themeOptions[index])
   }
 
   render(){
+
+    var nextItem = (list,curr) =>{
+      return (list.indexOf(curr) + 1) % list.length;
+    }
+
+    var prevItem = (list,curr) => {
+      var prev =list.indexOf(curr) - 1;
+      return (prev < 0 ? list.length-1 :prev);
+    }
+
     return (
       React.createElement("div", {className: "column-container"}, 
-        React.createElement("h1", null, "Options Menu"), 
+        React.createElement("h1", null, " Options Menu "), 
+
+          React.createElement("span", {className: "menu-item"}, 
+            "Difficulty:", 
+            React.createElement("span", {className: "glyphicon glyphicon-menu-left", 
+                  onClick: this.handleDifficultyClick}), 
+                  this.props.options.difficulty, 
+            React.createElement("span", {className: "glyphicon glyphicon-menu-right", 
+                  onClick: this.handleDifficultyClick})
+          ), 
+
+          React.createElement("span", {className: "menu-item"}, 
+            "Theme:", 
+            React.createElement("span", {className: "glyphicon glyphicon-menu-left", 
+                  onClick: this.handleThemeClick}), 
+              this.props.options.theme, 
+            React.createElement("span", {className: "glyphicon glyphicon-menu-right", 
+                  onClick: this.handleThemeClick})
+          ), 
+
         React.createElement("a", {href: "#", className: "return-link", onClick: this.props.toMainMenu}, 
           React.createElement("span", {className: "menu-item"}, "Main Menu"))
       )
     );
   }
+/*
+  render(){
+    return (
+      <div className='column-container'>
+        <h1>Options Menu</h1>
+        <a href="#" className='return-link'  onClick={this.props.toMainMenu}>
+          <span className='menu-item'>Main Menu</span></a>
+      </div>
+    );
+  }
+  */
 }
 
 module.exports = Options;
@@ -20558,7 +20630,6 @@ class Board extends React.Component{
       player: 'one',
       current: 'X',
       winner: '',
-      running: true,
       boardValues: Array.from(Array(9),() => '')
     };
   }
@@ -20603,12 +20674,13 @@ class Board extends React.Component{
       [2,4,6]];
 
 
-    var isWinner =
-    toCheck.map( (current) =>{
+    /* This checks if there is 3 in a row at each triplet shown in toCheck, then
+    uses reduce get a single truth value indicating whether there is a winner or
+    not. */
+    var isWinner = toCheck.map( (current) => {
         return board.filter((c,i) => {return current.includes(i)})
              .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
-      })
-      .reduce((acc,curr) =>{return acc || curr},false);
+      }).reduce((acc,curr) =>{return acc || curr},false);
 
 
     return (isWinner? this.state.current :'');
@@ -20680,6 +20752,7 @@ class Menu extends React.Component{
     super();
     this.state = this.getInitialState();
     this.changeSelected = this.changeSelected.bind(this);
+    this.handleChangeOptions = this.handleChangeOptions.bind(this);
   }
 
   getInitialState(){
@@ -20692,8 +20765,17 @@ class Menu extends React.Component{
     };
   }
 
-  handleChangeOptions(){
-    return;
+  handleChangeOptions(option,choice){
+    //Make copy since states should be treated as immutable
+
+    var newOptions = {
+      difficulty: this.state.options.difficulty,
+      theme: this.state.options.theme
+    }
+
+    newOptions[option] = choice;
+
+    this.setState({options: newOptions});
   }
 
   changeSelected(e){
@@ -20724,7 +20806,8 @@ class Menu extends React.Component{
   }
 
   getOptionsMenu(){
-    return React.createElement(Options, {changeOptions: this.handleChangeOptions, 
+    return React.createElement(Options, {options: this.state.options, 
+                    changeOptions: this.handleChangeOptions, 
                     toMainMenu: this.changeSelected})
   }
 

@@ -30,6 +30,12 @@ html, body{
   color:white;
 }
 
+/* For option Menu*/
+.menu-item >span, column-container>span{
+  display:inline-block;
+  margin: 10px;
+}
+
 .center-container{
   width:100%;
   height:100%;

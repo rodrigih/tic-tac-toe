@@ -9,6 +9,7 @@ class Menu extends React.Component{
     super();
     this.state = this.getInitialState();
     this.changeSelected = this.changeSelected.bind(this);
+    this.handleChangeOptions = this.handleChangeOptions.bind(this);
   }
 
   getInitialState(){
@@ -21,8 +22,17 @@ class Menu extends React.Component{
     };
   }
 
-  handleChangeOptions(){
-    return;
+  handleChangeOptions(option,choice){
+    //Make copy since states should be treated as immutable
+
+    var newOptions = {
+      difficulty: this.state.options.difficulty,
+      theme: this.state.options.theme
+    }
+
+    newOptions[option] = choice;
+
+    this.setState({options: newOptions});
   }
 
   changeSelected(e){
@@ -53,7 +63,8 @@ class Menu extends React.Component{
   }
 
   getOptionsMenu(){
-    return <Options changeOptions={this.handleChangeOptions}
+    return <Options options = {this.state.options}
+                    changeOptions={this.handleChangeOptions}
                     toMainMenu={this.changeSelected}/>
   }
 
