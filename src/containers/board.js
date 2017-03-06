@@ -2,7 +2,8 @@
 
 var React = require('react');
 var Piece = require('../components/piece.js');
-
+var Computer = require('../classes/computer.js);
+')
 class Board extends React.Component{
   constructor(){
     super();
@@ -26,12 +27,17 @@ class Board extends React.Component{
   }
 
   getWinnerScreen(){
+    console.log(this.state.winner,this.state.winner === 'tied');
+   var winnerHeading = (this.state.winner === 'tied' ?
+                         "Game is tied":
+                         this.state.winner + " is the winner");
+
     return (
       <div id='win-container'>
         <div id='win-menu'>
-
-          <h1 id='title'>{this.state.winner} is the winner!</h1>
-
+          <h1 id='title'>
+            {winnerHeading}
+          </h1>
           <a href="#" onClick={this.restartGame}>
             <span className='menu-item'>Play Again</span>
           </a>
@@ -50,6 +56,11 @@ class Board extends React.Component{
   }
 
   checkWinner(board){
+
+    if(!board.includes('')){
+      return 'tied';
+    }
+
     var toCheck = [
       [0,1,2],
       [3,4,5],
@@ -69,7 +80,6 @@ class Board extends React.Component{
              .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
       }).reduce((acc,curr) =>{return acc || curr},false);
 
-
     return (isWinner? this.state.current :'');
   }
 
@@ -82,6 +92,8 @@ class Board extends React.Component{
     }
 
     newBoard[index] = this.state.current;
+
+    var isWinner = this.checkWinner(newBoard);
 
     this.setState({
       current: this.changeTurn(),
