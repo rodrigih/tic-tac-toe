@@ -2,15 +2,19 @@
 
 var React = require('react');
 var Piece = require('../components/piece.js');
-var Computer = require('../classes/computer.js);
-')
+var Computer = require('../classes/computer.js');
+
 class Board extends React.Component{
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state = this.getInitialState();
     this.placePiece = this.placePiece.bind(this);
     this.checkWinner = this.checkWinner.bind(this);
     this.restartGame = this.restartGame.bind(this);
+
+    if(this.props.mode === 'one'){
+      this.computer = new Computer(this.props.difficulty,'X');
+    }
   }
 
   getInitialState(){
@@ -27,7 +31,6 @@ class Board extends React.Component{
   }
 
   getWinnerScreen(){
-    console.log(this.state.winner,this.state.winner === 'tied');
    var winnerHeading = (this.state.winner === 'tied' ?
                          "Game is tied":
                          this.state.winner + " is the winner");
@@ -55,11 +58,7 @@ class Board extends React.Component{
     return next;
   }
 
-  checkWinner(board){
-
-    if(!board.includes('')){
-      return 'tied';
-    }
+  checkWinner(board,currentPiece){
 
     var toCheck = [
       [0,1,2],
@@ -72,34 +71,59 @@ class Board extends React.Component{
       [2,4,6]];
 
 
-    /* This checks if there is 3 in a row at each triplet shown in toCheck, then
-    uses reduce get a single truth value indicating whether there is a winner or
-    not. */
+    /* This checks if there is 3 in a row of currentPiece
+    at each triplet shown in toCheck, then uses reduce get a single truth value
+    indicating whether there is a winner or not. */
     var isWinner = toCheck.map( (current) => {
         return board.filter((c,i) => {return current.includes(i)})
-             .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
+             .reduce((acc,curr) => {return acc && (curr === currentPiece)},true);
       }).reduce((acc,curr) =>{return acc || curr},false);
 
-    return (isWinner? this.state.current :'');
+    return (isWinner? currentPiece :'');
   }
 
   placePiece(index){
-    var newBoard = this.state.boardValues.slice();
-
     /* Don't do anything if there is already a piece placed*/
     if(this.state.boardValues[index] !== ''){
       return;
     }
 
+    var newBoard = this.state.boardValues.slice();
+
     newBoard[index] = this.state.current;
 
-    var isWinner = this.checkWinner(newBoard);
+    var newState = {
+        current: this.changeTurn(),
+        boardValues: newBoard,
+        winner: this.checkWinner(newBoard,this.state.current)
+    };
 
-    this.setState({
-      current: this.changeTurn(),
-      boardValues: newBoard,
-      winner: this.checkWinner(newBoard)
-    });
+    /* Check if game is tied after human player moves*/
+    if(!newBoard.includes('') && newState.winner === ''){
+      newState.winner = 'tied';
+      this.setState(newState);
+      return;
+    }
+
+    /* Computer moves after player*/
+
+    if(this.props.mode === 'one' && newState.winner === ''){
+      var compMove = this.computer.move(newBoard);
+      newBoard[compMove] = newState.current;
+
+      newState.winner =  this.checkWinner(newBoard,newState.current);
+      newState.current =  this.state.current;
+      newState.boardValues =  newBoard;
+    }
+
+    /* Check if game is tied after computer player moves*/
+    if(!newBoard.includes('') && newState.winner === ''){
+      newState.winner = 'tied';
+    }
+
+    //console.log(newState);
+
+    this.setState(newState);
 
   }
 

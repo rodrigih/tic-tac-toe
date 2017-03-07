@@ -20491,6 +20491,83 @@ module.exports = require('./lib/React');
 },{"./lib/React":155}],179:[function(require,module,exports){
 'use strict';
 
+class Computer{
+
+  constructor(difficulty,opponent){
+    this.difficulty = difficulty;
+    this.opponent = opponent;
+    this.move = (difficulty === 'easy'? this.makeEasyMove : this.makeNormalMove);
+    this.winningMoves =
+      [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]];
+  }
+
+  randomSelect(a){
+    return a[Math.floor(Math.random() * a.length)];
+  }
+
+  makeEasyMove(board){
+    /*
+    - Find all indices without a piece on it
+    - Pick one at random.
+    */
+
+
+    var empty = board.map((c,i) => (c === '' ? i : ''))
+           .filter((c) => c !== '')
+
+    return this.randomSelect(empty);
+
+  }
+
+  makeNormalMove(board){
+
+    /* Medium difficulty moves same as Easy moves, except priority is given to
+     * spaces where there is about to be 3 in a row.*/
+
+    function consecutive(a){
+      return Math.max( a.reduce((acc,curr) => (curr === 'X' ? ++acc:acc),0),
+        a.reduce((acc,curr) => (curr === 'O' ? ++acc:acc),0)
+      );
+    }
+
+    function containsNumber(a){
+      return a.map((c) => !isNaN(c)).reduce((acc,curr) => acc || curr,false);
+    }
+
+    /* Triplets is winningMoves with index replaced by occupied piece.
+     * If no piece is there, then the index is not replaced.
+    */
+    var triplets = this.winningMoves.map((c) => c.map((i) => (board[i] !== ''?board[i]:i)));
+
+    /* Filter triples that does not have an empty space*/
+    triplets = triplets.filter((c) => containsNumber(c));
+
+    /* Filter triplets that have two of the same piece */
+    triplets = triplets.filter((curr) => consecutive(curr) === 2);
+
+    if(triplets.length !== 0){
+      return this.randomSelect(triplets).find((curr) => ! isNaN(curr));
+    }
+    else{
+      return this.makeEasyMove(board);
+    }
+
+  }
+}
+
+module.exports = Computer;
+
+},{}],180:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 
 class Options extends React.Component{
@@ -20501,7 +20578,7 @@ class Options extends React.Component{
   }
 
   handleDifficultyClick(e){
-    var difficultyOptions = ['easy','medium','hard'];
+    var difficultyOptions = ['easy','normal'];
     var current = difficultyOptions.indexOf(this.props.options.difficulty);
 
     var index;
@@ -20583,7 +20660,7 @@ class Options extends React.Component{
 
 module.exports = Options;
 
-},{"react":178}],180:[function(require,module,exports){
+},{"react":178}],181:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -20610,19 +20687,24 @@ class Piece extends React.Component{
 
 module.exports = Piece;
 
-},{"react":178}],181:[function(require,module,exports){
+},{"react":178}],182:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var Piece = require('../components/piece.js');
+var Computer = require('../classes/computer.js');
 
 class Board extends React.Component{
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state = this.getInitialState();
     this.placePiece = this.placePiece.bind(this);
     this.checkWinner = this.checkWinner.bind(this);
     this.restartGame = this.restartGame.bind(this);
+
+    if(this.props.mode === 'one'){
+      this.computer = new Computer(this.props.difficulty,'X');
+    }
   }
 
   getInitialState(){
@@ -20639,12 +20721,16 @@ class Board extends React.Component{
   }
 
   getWinnerScreen(){
+   var winnerHeading = (this.state.winner === 'tied' ?
+                         "Game is tied":
+                         this.state.winner + " is the winner");
+
     return (
       React.createElement("div", {id: "win-container"}, 
         React.createElement("div", {id: "win-menu"}, 
-
-          React.createElement("h1", {id: "title"}, this.state.winner, " is the winner!"), 
-
+          React.createElement("h1", {id: "title"}, 
+            winnerHeading
+          ), 
           React.createElement("a", {href: "#", onClick: this.restartGame}, 
             React.createElement("span", {className: "menu-item"}, "Play Again")
           ), 
@@ -20662,7 +20748,8 @@ class Board extends React.Component{
     return next;
   }
 
-  checkWinner(board){
+  checkWinner(board,currentPiece){
+
     var toCheck = [
       [0,1,2],
       [3,4,5],
@@ -20674,33 +20761,59 @@ class Board extends React.Component{
       [2,4,6]];
 
 
-    /* This checks if there is 3 in a row at each triplet shown in toCheck, then
-    uses reduce get a single truth value indicating whether there is a winner or
-    not. */
+    /* This checks if there is 3 in a row of currentPiece
+    at each triplet shown in toCheck, then uses reduce get a single truth value
+    indicating whether there is a winner or not. */
     var isWinner = toCheck.map( (current) => {
         return board.filter((c,i) => {return current.includes(i)})
-             .reduce((acc,curr) => {return acc && (curr === this.state.current)},true);
+             .reduce((acc,curr) => {return acc && (curr === currentPiece)},true);
       }).reduce((acc,curr) =>{return acc || curr},false);
 
-
-    return (isWinner? this.state.current :'');
+    return (isWinner? currentPiece :'');
   }
 
   placePiece(index){
-    var newBoard = this.state.boardValues.slice();
-
     /* Don't do anything if there is already a piece placed*/
     if(this.state.boardValues[index] !== ''){
       return;
     }
 
+    var newBoard = this.state.boardValues.slice();
+
     newBoard[index] = this.state.current;
 
-    this.setState({
-      current: this.changeTurn(),
-      boardValues: newBoard,
-      winner: this.checkWinner(newBoard)
-    });
+    var newState = {
+        current: this.changeTurn(),
+        boardValues: newBoard,
+        winner: this.checkWinner(newBoard,this.state.current)
+    };
+
+    /* Check if game is tied after human player moves*/
+    if(!newBoard.includes('') && newState.winner === ''){
+      newState.winner = 'tied';
+      this.setState(newState);
+      return;
+    }
+
+    /* Computer moves after player*/
+
+    if(this.props.mode === 'one' && newState.winner === ''){
+      var compMove = this.computer.move(newBoard);
+      newBoard[compMove] = newState.current;
+
+      newState.winner =  this.checkWinner(newBoard,newState.current);
+      newState.current =  this.state.current;
+      newState.boardValues =  newBoard;
+    }
+
+    /* Check if game is tied after computer player moves*/
+    if(!newBoard.includes('') && newState.winner === ''){
+      newState.winner = 'tied';
+    }
+
+    //console.log(newState);
+
+    this.setState(newState);
 
   }
 
@@ -20740,7 +20853,7 @@ class Board extends React.Component{
 
 module.exports = Board;
 
-},{"../components/piece.js":180,"react":178}],182:[function(require,module,exports){
+},{"../classes/computer.js":179,"../components/piece.js":181,"react":178}],183:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -20802,6 +20915,7 @@ class Menu extends React.Component{
   getBoard(){
     return React.createElement(Board, {mode: this.state.selected, 
                   theme: this.state.options.theme, 
+                  difficulty: this.state.options.difficulty, 
                   toMainMenu: this.changeSelected})
   }
 
@@ -20855,7 +20969,7 @@ class Menu extends React.Component{
 
 module.exports = Menu;
 
-},{"../components/options.js":179,"./board.js":181,"react":178}],183:[function(require,module,exports){
+},{"../components/options.js":180,"./board.js":182,"react":178}],184:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -20864,4 +20978,4 @@ var Menu = require('./containers/menu.js');
 
 ReactDOM.render(React.createElement(Menu, null),document.getElementById('app'));
 
-},{"./containers/menu.js":182,"react":178,"react-dom":25}]},{},[183]);
+},{"./containers/menu.js":183,"react":178,"react-dom":25}]},{},[184]);

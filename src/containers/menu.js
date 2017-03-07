@@ -59,6 +59,7 @@ class Menu extends React.Component{
   getBoard(){
     return <Board mode={this.state.selected}
                   theme={this.state.options.theme}
+                  difficulty={this.state.options.difficulty}
                   toMainMenu={this.changeSelected}/>
   }
 

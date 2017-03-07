@@ -10,7 +10,7 @@ class Options extends React.Component{
   }
 
   handleDifficultyClick(e){
-    var difficultyOptions = ['easy','medium','hard'];
+    var difficultyOptions = ['easy','normal'];
     var current = difficultyOptions.indexOf(this.props.options.difficulty);
 
     var index;
