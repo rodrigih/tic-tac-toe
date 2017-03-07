@@ -68,6 +68,7 @@ html, body{
 }
 
 .game-piece{
+  color:white;
   margin:0;
   padding:0;
   font-family: 'Barrio';
